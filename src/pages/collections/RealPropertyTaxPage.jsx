@@ -1,350 +1,170 @@
-import { useState } from 'react';
-import { Formik, Form } from 'formik';
-import { PlusIcon, EyeIcon, PencilIcon } from '@heroicons/react/24/outline';
-import DataTable from '../../components/common/DataTable';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import Modal from '../../components/common/Modal';
-import FormField from '../../components/common/FormField';
-import { realPropertyTaxSchema } from '../../utils/validationSchemas';
+import DataTable from '../../components/common/DataTable';
+import RealPropertyTaxForm from '../../components/forms/RealPropertyTaxForm';
 
 function RealPropertyTaxPage() {
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPayment, setCurrentPayment] = useState(null);
-  
-  // Mock data for table
-  const payments = [
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const { realPropertyTaxes, isLoading } = useSelector((state) => state.realPropertyTax);
+
+  // Mock data for demonstration
+  const mockData = [
     {
       id: 1,
-      receiptNumber: 'RPT-2024-01-0001',
-      date: '2024-01-15',
-      tdNumber: 'TD-123-2024',
-      taxpayerName: 'John Smith',
-      location: 'Lot 1, Block 2, Sample Subdivision',
-      basicTax: 5000,
-      sef: 1000,
-      penalty: 0,
-      totalAmount: 6000,
-      status: 'Paid',
+      tdNo: 'TD-001',
+      owner: 'John Doe',
+      address: '123 Main St',
+      beneficialUser: 'Jane Doe',
+      beneficialAddress: '456 Oak St',
+      octTctCloaNo: 'OCT-123',
+      cct: 'CCT-456',
+      dated: '2024-03-20',
+      propertyIdentificationNo: '12345',
+      tin: '123-456-789',
+      ownerTelephoneNo: '1234567890',
+      beneficialTin: '987-654-321',
+      beneficialTelephoneNo: '0987654321',
+      surveyNo: 'S-001',
+      lotNo: 'L-001',
+      blockNo: 'B-001',
+      boundaries: {
+        taxable: true,
+        north: 'Street A',
+        south: 'Street B',
+        east: 'Street C',
+        west: 'Street D',
+      },
+      cancelledTdNo: 'TD-000',
+      cancelledOwner: 'Previous Owner',
+      effectivityOfAssessment: '2024-01-01',
+      previousOwner: 'Previous Owner',
+      previousAssessedValue: '1000000',
+      propertyDetails: {
+        kind: 'Land',
+        numberOf: '1',
+        description: 'Residential lot',
+      },
+      assessmentDetails: {
+        kind: 'Land',
+        actualUse: 'Residential',
+        classification: 'Class 1',
+        areaSize: 'Medium',
+        assessmentLevel: '20%',
+        marketValue: '1500000',
+      },
+      status: 'active',
     },
-    {
-      id: 2,
-      receiptNumber: 'RPT-2024-01-0002',
-      date: '2024-01-20',
-      tdNumber: 'TD-124-2024',
-      taxpayerName: 'Jane Doe',
-      location: 'Lot 5, Block 3, Another Subdivision',
-      basicTax: 7500,
-      sef: 1500,
-      penalty: 500,
-      totalAmount: 9500,
-      status: 'Paid',
-    },
+    // Add more mock data as needed
   ];
-  
-  // Format amount as Philippine Peso
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP',
-    }).format(amount);
-  };
-  
-  // Table columns
+
   const columns = [
     {
-      key: 'receiptNumber',
-      header: 'Receipt No.',
-      sortable: true,
-      className: 'font-medium text-neutral-900',
+      header: 'TD No.',
+      accessorKey: 'tdNo',
+      enableSorting: true,
     },
     {
-      key: 'date',
+      header: 'Owner',
+      accessorKey: 'owner',
+      enableSorting: true,
+    },
+    {
+      header: 'Address',
+      accessorKey: 'address',
+    },
+    {
+      header: 'Property ID',
+      accessorKey: 'propertyIdentificationNo',
+    },
+    {
       header: 'Date',
-      sortable: true,
-      render: (value) => new Date(value).toLocaleDateString(),
+      accessorKey: 'dated',
+      cell: ({ row }) => new Date(row.original.dated).toLocaleDateString(),
     },
     {
-      key: 'tdNumber',
-      header: 'TD Number',
-      sortable: true,
-    },
-    {
-      key: 'taxpayerName',
-      header: 'Taxpayer',
-      sortable: true,
-    },
-    {
-      key: 'basicTax',
-      header: 'Basic Tax',
-      sortable: true,
-      render: (value) => formatCurrency(value),
-      className: 'text-right',
-    },
-    {
-      key: 'sef',
-      header: 'SEF',
-      sortable: true,
-      render: (value) => formatCurrency(value),
-      className: 'text-right',
-    },
-    {
-      key: 'penalty',
-      header: 'Penalty',
-      sortable: true,
-      render: (value) => formatCurrency(value),
-      className: 'text-right',
-    },
-    {
-      key: 'totalAmount',
-      header: 'Total Amount',
-      sortable: true,
-      render: (value) => formatCurrency(value),
-      className: 'text-right font-medium',
-    },
-    {
-      key: 'status',
       header: 'Status',
-      sortable: true,
-      render: (value) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          value === 'Paid' ? 'bg-success-100 text-success-800' : 'bg-warning-100 text-warning-800'
-        }`}>
-          {value}
+      accessorKey: 'status',
+      cell: ({ row }) => (
+        <span
+          className={`px-2 py-1 text-xs font-medium rounded-full ${
+            row.original.status === 'active'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {row.original.status}
         </span>
       ),
     },
   ];
-  
-  // Actions for table rows
-  const actions = [
-    {
-      icon: EyeIcon,
-      title: 'View',
-      onClick: (payment) => handleViewPayment(payment),
-      className: 'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50'
-    },
-    {
-      icon: PencilIcon,
-      title: 'Edit',
-      onClick: (payment) => handleEditPayment(payment),
-      className: 'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50'
-    },
-  ];
-  
-  const handleCreatePayment = () => {
-    setCurrentPayment(null);
+
+  const handleAddNew = () => {
+    setSelectedRecord(null);
     setIsModalOpen(true);
   };
-  
-  const handleViewPayment = (payment) => {
-    setCurrentPayment(payment);
+
+  const handleEdit = (record) => {
+    setSelectedRecord(record);
     setIsModalOpen(true);
   };
-  
-  const handleEditPayment = (payment) => {
-    setCurrentPayment(payment);
-    setIsModalOpen(true);
+
+  const handleDelete = (record) => {
+    // Implement delete functionality
+    console.log('Delete record:', record);
   };
-  
-  const handleSubmit = (values, { setSubmitting }) => {
-    realPropertyTaxSchema.validate(values, { abortEarly: false })
-      .then(() => {
-        // If validation passes, proceed with submission
-        console.log('Form data:', values);
-        setIsModalOpen(false);
-      })
-      .catch((err) => {
-        // Handle validation errors
-        console.error('Validation errors:', err.errors);
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+
+  const handleSubmit = async (values) => {
+    try {
+      if (selectedRecord) {
+        // Update existing record
+        console.log('Update record:', values);
+      } else {
+        // Create new record
+        console.log('Create record:', values);
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error saving record:', error);
+    }
   };
 
   return (
-    <div>
-      <div className="page-header">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1>Real Property Tax</h1>
-            <p>Manage real property tax collections</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleCreatePayment}
-            className="btn btn-primary flex items-center"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            New Payment
-          </button>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900">Real Property Tax</h1>
+        <button
+          onClick={handleAddNew}
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+          Add New
+        </button>
       </div>
-      
-      <div className="mt-4">
+
+      <div className="bg-white shadow rounded-lg">
         <DataTable
           columns={columns}
-          data={payments}
-          actions={actions}
-          pagination={true}
+          data={mockData}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
       </div>
-      
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={currentPayment ? "Edit Payment" : "New Payment"}
-        size="lg"
+        title={selectedRecord ? 'Edit Real Property Tax' : 'Add New Real Property Tax'}
       >
-        <Formik
-          initialValues={{
-            date: new Date().toISOString().split('T')[0],
-            tdNumber: '',
-            taxpayerName: '',
-            location: '',
-            basicTax: '',
-            sef: '',
-            penalty: '0',
-            ...currentPayment,
-          }}
-          validationSchema={realPropertyTaxSchema}
+        <RealPropertyTaxForm
+          initialData={selectedRecord}
           onSubmit={handleSubmit}
-        >
-          {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
-            <Form className="p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="Date"
-                  name="date"
-                  type="date"
-                  required
-                  value={values.date}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.date}
-                  touched={touched.date}
-                />
-                
-                <FormField
-                  label="TD Number"
-                  name="tdNumber"
-                  type="text"
-                  required
-                  placeholder="Enter TD number"
-                  value={values.tdNumber}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.tdNumber}
-                  touched={touched.tdNumber}
-                />
-              </div>
-              
-              <FormField
-                label="Taxpayer Name"
-                name="taxpayerName"
-                type="text"
-                required
-                placeholder="Enter taxpayer name"
-                value={values.taxpayerName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.taxpayerName}
-                touched={touched.taxpayerName}
-              />
-              
-              <FormField
-                label="Property Location"
-                name="location"
-                type="textarea"
-                required
-                placeholder="Enter property location"
-                value={values.location}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.location}
-                touched={touched.location}
-                rows={2}
-              />
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField
-                  label="Basic Tax"
-                  name="basicTax"
-                  type="number"
-                  required
-                  placeholder="0.00"
-                  value={values.basicTax}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.basicTax}
-                  touched={touched.basicTax}
-                  min="0"
-                  step="0.01"
-                />
-                
-                <FormField
-                  label="SEF"
-                  name="sef"
-                  type="number"
-                  required
-                  placeholder="0.00"
-                  value={values.sef}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.sef}
-                  touched={touched.sef}
-                  min="0"
-                  step="0.01"
-                />
-                
-                <FormField
-                  label="Penalty"
-                  name="penalty"
-                  type="number"
-                  placeholder="0.00"
-                  value={values.penalty}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.penalty}
-                  touched={touched.penalty}
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-              
-              <div className="mt-4 p-4 bg-neutral-50 rounded-lg border border-neutral-200">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-neutral-600">Total Amount</p>
-                    <p className="text-lg font-semibold">
-                      {formatCurrency(
-                        Number(values.basicTax || 0) +
-                        Number(values.sef || 0) +
-                        Number(values.penalty || 0)
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 pt-4 border-t border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="btn btn-outline"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-primary"
-                >
-                  {isSubmitting ? 'Saving...' : currentPayment ? 'Update' : 'Save'}
-                </button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+          onClose={() => setIsModalOpen(false)}
+        />
       </Modal>
     </div>
   );

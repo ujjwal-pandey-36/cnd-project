@@ -27,6 +27,9 @@ import { paymentTermsReducer } from '../features/settings/paymentTermsSlice';
 import { industryReducer } from '../features/settings/industrySlice';
 import communityTaxReducer from '../features/communityTax/communityTaxSlice';
 import generalServiceReceiptsReducer from '../features/collections/generalServiceReceiptsSlice';
+import disbursementJournalReducer from '../features/disbursement/disbursementJournalSlice';
+import generalJournalReducer from '../features/disbursement/generalJournalSlice';
+import realPropertyTaxReducer from '../features/collections/realPropertyTaxSlice';
 
 export const store = configureStore({
   reducer: {
@@ -57,7 +60,10 @@ export const store = configureStore({
     paymentTerms: paymentTermsReducer,
     industries: industryReducer,
     communityTax: communityTaxReducer,
-    generalServiceReceipts: generalServiceReceiptsReducer
+    generalServiceReceipts: generalServiceReceiptsReducer,
+    disbursementJournal: disbursementJournalReducer,
+    generalJournal: generalJournalReducer,
+    realPropertyTax: realPropertyTaxReducer
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({

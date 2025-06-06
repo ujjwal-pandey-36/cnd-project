@@ -26,41 +26,43 @@ const initialState = {
 // Async thunks
 export const fetchGeneralJournals = createAsyncThunk(
   'generalJournal/fetchGeneralJournals',
-  async (filters, { rejectWithValue }) => {
-    try {
-      // Replace with actual API call
-      // const response = await api.get('/api/general-journals', { params: filters });
-      // return response.data;
-      
-      // Simulate API call with mock data
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockGeneralJournals);
-        }, 1000);
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+  async (filters) => {
+    // TODO: Replace with actual API call
+    // For now, return mock data
+    return [
+      {
+        id: 1,
+        date: '2024-03-20',
+        reference: 'GJ-2024-001',
+        particulars: 'Monthly Rent',
+        accountCode: '5010',
+        debit: 50000.00,
+        credit: 0.00,
+        status: 'Posted',
+        postedBy: 'John Doe',
+        postedDate: '2024-03-20T10:00:00'
+      },
+      {
+        id: 2,
+        date: '2024-03-19',
+        reference: 'GJ-2024-002',
+        particulars: 'Utility Bills',
+        accountCode: '5020',
+        debit: 15000.00,
+        credit: 0.00,
+        status: 'Draft',
+        postedBy: null,
+        postedDate: null
+      }
+    ];
   }
 );
 
 export const exportGeneralJournals = createAsyncThunk(
   'generalJournal/exportGeneralJournals',
-  async (filters, { rejectWithValue }) => {
-    try {
-      // Replace with actual API call
-      // const response = await api.get('/api/general-journals/export', { params: filters });
-      // return response.data;
-      
-      // Simulate API call
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true, message: 'Export successful' });
-        }, 1000);
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+  async (filters) => {
+    // TODO: Replace with actual API call
+    return true;
   }
 );
 
@@ -86,7 +88,7 @@ const generalJournalSlice = createSlice({
       })
       .addCase(fetchGeneralJournals.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       })
       // Export general journals
       .addCase(exportGeneralJournals.pending, (state) => {
@@ -98,7 +100,7 @@ const generalJournalSlice = createSlice({
       })
       .addCase(exportGeneralJournals.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
   },
 });

@@ -31,42 +31,57 @@ const initialState = {
 
 // Async thunks
 export const fetchDisbursementJournals = createAsyncThunk(
-  'disbursementJournal/fetchDisbursementJournals',
-  async (filters, { rejectWithValue }) => {
-    try {
-      // Replace with actual API call
-      // const response = await api.get('/api/disbursement-journals', { params: filters });
-      // return response.data;
-      
-      // Simulate API call with mock data
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(mockDisbursementJournals);
-        }, 1000);
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+  'disbursementJournal/fetchJournals',
+  async (filters) => {
+    // TODO: Replace with actual API call
+    // Mock data for demonstration
+    return [
+      {
+        id: 1,
+        municipality: 'Sample Municipality',
+        funds: 'General Fund',
+        date: '2024-03-20',
+        checkNo: 'CHK-001',
+        voucherNo: 'DV-001',
+        jevNo: 'JEV-001',
+        claimant: 'John Doe',
+        particulars: 'Office Supplies',
+        accountCode: '1-01-01-010',
+        debit: 5000,
+        credit: 0,
+        approver: 'Jane Smith',
+        position: 'Department Head',
+        startDate: '2024-03-01',
+        endDate: '2024-03-31',
+      },
+      {
+        id: 2,
+        municipality: 'Sample Municipality',
+        funds: 'Special Fund',
+        date: '2024-03-21',
+        checkNo: 'CHK-002',
+        voucherNo: 'DV-002',
+        jevNo: 'JEV-002',
+        claimant: 'Alice Johnson',
+        particulars: 'Equipment Purchase',
+        accountCode: '1-01-02-020',
+        debit: 15000,
+        credit: 0,
+        approver: 'Bob Wilson',
+        position: 'Department Head',
+        startDate: '2024-03-01',
+        endDate: '2024-03-31',
+      },
+    ];
   }
 );
 
 export const exportDisbursementJournals = createAsyncThunk(
-  'disbursementJournal/exportDisbursementJournals',
-  async (filters, { rejectWithValue }) => {
-    try {
-      // Replace with actual API call
-      // const response = await api.get('/api/disbursement-journals/export', { params: filters });
-      // return response.data;
-      
-      // Simulate API call
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true, message: 'Export successful' });
-        }, 1000);
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
+  'disbursementJournal/exportJournals',
+  async (filters) => {
+    // TODO: Replace with actual API call
+    console.log('Exporting journals with filters:', filters);
+    return true;
   }
 );
 
@@ -81,7 +96,7 @@ const disbursementJournalSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch disbursement journals
+      // Fetch Journals
       .addCase(fetchDisbursementJournals.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -92,9 +107,9 @@ const disbursementJournalSlice = createSlice({
       })
       .addCase(fetchDisbursementJournals.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       })
-      // Export disbursement journals
+      // Export Journals
       .addCase(exportDisbursementJournals.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -104,7 +119,7 @@ const disbursementJournalSlice = createSlice({
       })
       .addCase(exportDisbursementJournals.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
   },
 });

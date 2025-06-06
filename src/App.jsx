@@ -40,10 +40,16 @@ import ObligationRequestPage from './pages/disbursement/ObligationRequestPage';
 import DisbursementVoucherPage from './pages/disbursement/DisbursementVoucherPage';
 import TravelOrderPage from './pages/disbursement/TravelOrderPage';
 import JournalEntryPage from './pages/disbursement/JournalEntryPage';
+import DisbursementJournalPage from './pages/disbursement/DisbursementJournalPage';
+import GeneralJournalPage from './pages/disbursement/GeneralJournalPage';
+import BeginningBalancePage from './pages/disbursement/BeginningBalancePage';
+import PurchaseRequestPage from './pages/disbursement/PurchaseRequestPage';
+import FundUtilizationRequestPage from './pages/fund-utilization/FundUtilizationRequestPage';
 
 // Collections pages
 import GeneralReceiptPage from './pages/collections/GeneralReceiptPage';
 import CommunityTaxPage from './pages/collections/CommunityTaxPage';
+import CommunityTaxCorporationPage from './pages/collections/CommunityTaxCorporationPage';
 import RealPropertyTaxPage from './pages/collections/RealPropertyTaxPage';
 import MarketCollectionsPage from './pages/collections/MarketCollectionsPage';
 import GeneralServiceReceiptPage from './pages/collections/GeneralServiceReceiptPage';
@@ -140,11 +146,17 @@ function App() {
           <Route path="/disbursement/obligation-requests" element={<ObligationRequestPage />} />
           <Route path="/disbursement/vouchers" element={<DisbursementVoucherPage />} />
           <Route path="/disbursement/travel-orders" element={<TravelOrderPage />} />
-          <Route path="/disbursement/journal-entries" element={<JournalEntryPage />} />
+          <Route path="/disbursement/journal-entry-vouchers" element={<JournalEntryPage />} />
+          <Route path="/disbursement/disbursement-journals" element={<DisbursementJournalPage />} />
+          <Route path="/disbursement/general-journals" element={<GeneralJournalPage />} />
+          <Route path="/disbursement/beginning-balance" element={<BeginningBalancePage />} />
+          <Route path="/disbursement/purchase-requests" element={<PurchaseRequestPage />} />
+          <Route path="/disbursement/fund-utilization-requests" element={<FundUtilizationRequestPage />} />
           
           {/* Collections module */}
           <Route path="/collections/receipts" element={<GeneralReceiptPage />} />
           <Route path="/collections/community-tax" element={<CommunityTaxPage />} />
+          <Route path="/collections/community-tax-corporation" element={<CommunityTaxCorporationPage />} />
           <Route path="/collections/real-property-tax" element={<RealPropertyTaxPage />} />
           <Route path="/collections/market" element={<MarketCollectionsPage />} />
           <Route path="/collections/general-service-receipts" element={<GeneralServiceReceiptPage />} />

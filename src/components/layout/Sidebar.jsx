@@ -99,7 +99,7 @@ const navigation = [
       { name: 'General Service Receipt', href: '/collections/general-service-receipts' },
       { name: 'Burial Service Receipt', href: '/collections/burial-service-receipts' },
       { name: 'Marriage Service Receipt', href: '/collections/marriage-service-receipts' },
-      { name: 'Real Property Tax Service Receipt', href: '/collections/real-property-tax-service-receipts' },
+      { name: 'Real Property Tax', href: '/collections/real-property-tax' },
       { name: 'CashBook', href: '/collections/cashbook' },
       { name: 'Collection Report', href: '/collections/reports' },
       { name: 'Public Market Ticket', href: '/collections/public-market-tickets' }
