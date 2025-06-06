@@ -30,6 +30,7 @@ import generalServiceReceiptsReducer from '../features/collections/generalServic
 import disbursementJournalReducer from '../features/disbursement/disbursementJournalSlice';
 import generalJournalReducer from '../features/disbursement/generalJournalSlice';
 import realPropertyTaxReducer from '../features/collections/realPropertyTaxSlice';
+import budgetReducer from '../features/budget/budgetSlice';
 
 export const store = configureStore({
   reducer: {
@@ -63,7 +64,8 @@ export const store = configureStore({
     generalServiceReceipts: generalServiceReceiptsReducer,
     disbursementJournal: disbursementJournalReducer,
     generalJournal: generalJournalReducer,
-    realPropertyTax: realPropertyTaxReducer
+    realPropertyTax: realPropertyTaxReducer,
+    budget: budgetReducer,
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({

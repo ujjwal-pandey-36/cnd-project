@@ -109,6 +109,7 @@ const navigation = [
     name: 'Budget', 
     icon: DocumentDuplicateIcon, 
     submenu: [
+      { name: 'Budget Management', href: '/budget' },
       { name: 'Budget Details', href: '/budget/details' },
       { name: 'Budget Allotment', href: '/budget/allotment' },
       { name: 'Budget Summary', href: '/budget/summary' },

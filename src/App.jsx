@@ -64,6 +64,7 @@ import AnnualBudgetPage from './pages/budget/AnnualBudgetPage';
 import AllotmentPage from './pages/budget/AllotmentPage';
 import FundsPage from './pages/budget/FundsPage';
 import BudgetTransferPage from './pages/budget/BudgetTransferPage';
+import BudgetPage from './pages/budget/BudgetPage';
 
 // Applications pages
 import BusinessPermitPage from './pages/applications/BusinessPermitPage';
@@ -167,6 +168,7 @@ function App() {
           <Route path="/collections/public-market-tickets" element={<PublicMarketTicketPage />} />
           
           {/* Budget module */}
+          <Route path="/budget" element={<BudgetPage />} />
           <Route path="/budget/annual" element={<AnnualBudgetPage />} />
           <Route path="/budget/allotments" element={<AllotmentPage />} />
           <Route path="/budget/funds" element={<FundsPage />} />
