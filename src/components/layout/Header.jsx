@@ -1,33 +1,36 @@
-import { useState, useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Menu, Transition } from '@headlessui/react';
-import { 
-  BellIcon, 
-  Bars3Icon, 
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Menu, Transition } from "@headlessui/react";
+import {
+  BellIcon,
+  Bars3Icon,
   XMarkIcon,
   UserCircleIcon,
   KeyIcon,
-  ArrowRightOnRectangleIcon
-} from '@heroicons/react/24/outline';
-import { logout } from '../../features/auth/authSlice';
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+import { logout } from "../../features/auth/authSlice";
 
 function Header({ toggleSidebar, isSidebarOpen }) {
   const dispatch = useDispatch();
-  const { user } = useSelector(state => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef(null);
 
   useEffect(() => {
     if (!showNotifications) return;
     function handleClickOutside(event) {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target)
+      ) {
         setShowNotifications(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showNotifications]);
 
@@ -47,7 +50,7 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                 onClick={toggleSidebar}
               >
                 <span className="sr-only">
-                  {isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+                  {isSidebarOpen ? "Close sidebar" : "Open sidebar"}
                 </span>
                 {isSidebarOpen ? (
                   <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -78,10 +81,11 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                 <Menu.Button className="bg-white rounded-full flex focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Open user menu</span>
                   <div className="h-8 w-8 rounded-full bg-primary-700 flex items-center justify-center text-white">
-                    {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || ''}
+                    {user?.firstName?.charAt(0) || ""}
+                    {user?.lastName?.charAt(0) || ""}
                   </div>
                 </Menu.Button>
-                
+
                 <Transition
                   enter="transition ease-out duration-100"
                   enterFrom="transform opacity-0 scale-95"
@@ -101,7 +105,7 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                         </p>
                       </div>
                     </div>
-                    <div className="py-1">
+                    {/* <div className="py-1">
                       <Menu.Item>
                         {({ active }) => (
                           <Link
@@ -128,17 +132,22 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                           </Link>
                         )}
                       </Menu.Item>
-                    </div>
+                    </div> */}
                     <div className="py-1">
                       <Menu.Item>
                         {({ active }) => (
                           <button
                             onClick={handleLogout}
                             className={`${
-                              active ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-700'
+                              active
+                                ? "bg-neutral-100 text-neutral-900"
+                                : "text-neutral-700"
                             } flex items-center px-4 py-2 text-sm w-full text-left`}
                           >
-                            <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5 text-neutral-400" aria-hidden="true" />
+                            <ArrowRightOnRectangleIcon
+                              className="mr-3 h-5 w-5 text-neutral-400"
+                              aria-hidden="true"
+                            />
                             Sign out
                           </button>
                         )}
@@ -151,12 +160,17 @@ function Header({ toggleSidebar, isSidebarOpen }) {
           </div>
         </div>
       </div>
-      
+
       {/* Notification panel */}
       {showNotifications && (
-        <div ref={notificationsRef} className="absolute right-4 mt-2 w-80 sm:w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <div
+          ref={notificationsRef}
+          className="absolute right-4 mt-2 w-80 sm:w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+        >
           <div className="p-4 border-b border-neutral-200">
-            <h3 className="text-lg font-medium text-neutral-900">Notifications</h3>
+            <h3 className="text-lg font-medium text-neutral-900">
+              Notifications
+            </h3>
           </div>
           <div className="divide-y divide-neutral-100 max-h-80 overflow-y-auto">
             <div className="p-4 hover:bg-neutral-50 cursor-pointer">
@@ -167,9 +181,15 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-neutral-900">New ORS needs approval</p>
-                  <p className="text-sm text-neutral-500">ORS-2024-01-0023 from IT Department</p>
-                  <p className="text-xs text-neutral-400 mt-1">30 minutes ago</p>
+                  <p className="text-sm font-medium text-neutral-900">
+                    New ORS needs approval
+                  </p>
+                  <p className="text-sm text-neutral-500">
+                    ORS-2024-01-0023 from IT Department
+                  </p>
+                  <p className="text-xs text-neutral-400 mt-1">
+                    30 minutes ago
+                  </p>
                 </div>
               </div>
             </div>
@@ -181,8 +201,12 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-neutral-900">DV approved</p>
-                  <p className="text-sm text-neutral-500">DV-2024-01-0015 has been approved</p>
+                  <p className="text-sm font-medium text-neutral-900">
+                    DV approved
+                  </p>
+                  <p className="text-sm text-neutral-500">
+                    DV-2024-01-0015 has been approved
+                  </p>
                   <p className="text-xs text-neutral-400 mt-1">2 hours ago</p>
                 </div>
               </div>
@@ -202,16 +226,38 @@ function Header({ toggleSidebar, isSidebarOpen }) {
 // Make the missing icon imports available
 function DocumentTextIcon(props) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+      />
     </svg>
   );
 }
 
 function CheckCircleIcon(props) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
     </svg>
   );
 }
