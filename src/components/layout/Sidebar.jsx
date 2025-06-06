@@ -102,7 +102,7 @@ const navigation = [
       { name: 'Real Property Tax Service Receipt', href: '/collections/real-property-tax-service-receipts' },
       { name: 'CashBook', href: '/collections/cashbook' },
       { name: 'Collection Report', href: '/collections/reports' },
-      { name: 'Public Market Ticketing', href: '/collections/market-ticketing' }
+      { name: 'Public Market Ticket', href: '/collections/public-market-tickets' }
     ]
   },
   { 
@@ -153,7 +153,7 @@ function SidebarMenu({ items, expandedMenus, toggleMenu, isActive, isSubMenuActi
     <div className={level > 0 ? `pl-${level * 4} space-y-1` : ''}>
       {items.map((item) => (
         <div key={item.name}>
-          {(item.submenu || item.children) ? (
+          {item.submenu ? (
             <>
               <button
                 onClick={(e) => {
@@ -162,7 +162,7 @@ function SidebarMenu({ items, expandedMenus, toggleMenu, isActive, isSubMenuActi
                 }}
                 className={clsx(
                   'group flex items-center justify-between text-left px-3 py-2 text-sm font-medium rounded-md w-full transition-colors',
-                  isSubMenuActive(item.submenu || item.children)
+                  isSubMenuActive(item.submenu)
                     ? 'bg-primary-50 text-primary-700'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 )}
@@ -171,7 +171,7 @@ function SidebarMenu({ items, expandedMenus, toggleMenu, isActive, isSubMenuActi
                   <item.icon
                     className={clsx(
                       'mr-3 h-5 w-5',
-                      isSubMenuActive(item.submenu || item.children)
+                      isSubMenuActive(item.submenu)
                         ? 'text-primary-500'
                         : 'text-neutral-400 group-hover:text-neutral-500'
                     )}
@@ -196,7 +196,7 @@ function SidebarMenu({ items, expandedMenus, toggleMenu, isActive, isSubMenuActi
               </button>
               {expandedMenus[item.name] && (
                 <SidebarMenu
-                  items={item.submenu || item.children}
+                  items={item.submenu}
                   expandedMenus={expandedMenus}
                   toggleMenu={toggleMenu}
                   isActive={isActive}
@@ -251,16 +251,9 @@ function Sidebar() {
   };
   
   const isSubMenuActive = (submenuItems) => {
-    if (!submenuItems) return false;
-    return submenuItems.some(item => {
-      if (item.href) {
-        return location.pathname === item.href;
-      }
-      if (item.submenu || item.children) {
-        return isSubMenuActive(item.submenu || item.children);
-      }
-      return false;
-    });
+    return submenuItems.some(item =>
+      item.href ? location.pathname === item.href : item.children && isSubMenuActive(item.children)
+    );
   };
 
   return (

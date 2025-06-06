@@ -1,16 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
-import  authReducer  from '../features/auth/authSlice';
-import  departmentReducer  from '../features/settings/departmentSlice';
-import  subdepartmentReducer  from '../features/settings/subdepartmentSlice';
-import userReducer  from '../features/settings/userSlice';
-import  chartOfAccountsReducer  from '../features/settings/chartOfAccountsSlice';
-import  vendorReducer  from '../features/settings/vendorSlice';
-import  employeeReducer  from '../features/settings/employeeSlice';
-import  locationReducer  from '../features/settings/locationSlice';
-import  ppeReducer  from '../features/settings/ppeSlice';
+import authReducer from '../features/auth/authSlice';
+import departmentReducer from '../features/settings/departmentSlice';
+import subdepartmentReducer from '../features/settings/subdepartmentSlice';
+import userReducer from '../features/settings/userSlice';
+import chartOfAccountsReducer from '../features/settings/chartOfAccountsSlice';
+import vendorReducer from '../features/settings/vendorSlice';
+import employeeReducer from '../features/settings/employeeSlice';
+import obligationRequestReducer from '../features/disbursement/obligationRequestSlice';
+import disbursementVoucherReducer from '../features/disbursement/disbursementVoucherSlice';
+import travelOrderReducer from '../features/disbursement/travelOrderSlice';
+import generalReceiptReducer from '../features/collections/generalReceiptSlice';
+import ppeReducer from '../features/settings/ppeSlice';
 import approvalMatrixReducer from '../features/settings/approvalMatrixSlice';
 import bankReducer from '../features/settings/bankSlice';
-import  documentDetailsReducer  from '../features/settings/documentDetailsSlice';
+import documentDetailsReducer from '../features/settings/documentDetailsSlice';
 import itemReducer from '../features/settings/itemSlice';
 import invoiceChargeAccountsReducer from '../features/settings/invoiceChargeAccountsSlice';
 import { itemUnitsReducer } from '../features/settings/itemUnitsSlice';
@@ -22,13 +25,10 @@ import { taxCodesReducer } from '../features/settings/taxCodeSlice';
 import { modeOfPaymentsReducer } from '../features/settings/modeOfPaymentSlice';
 import { paymentTermsReducer } from '../features/settings/paymentTermsSlice';
 import { industryReducer } from '../features/settings/industrySlice';
-import { budgetDetailsReducer } from '../features/budget/budgetDetailsSlice';
-import  disbursementJournalReducer  from '../features/disbursement/disbursementJournalSlice';
-import generalJournalReducer from '../features/disbursement/generalJournalSlice';
-import beginningBalanceReducer from '../features/disbursement/beginningBalanceSlice';
-import purchaseRequestReducer from '../features/disbursement/purchaseRequestSlice';
+import communityTaxReducer from '../features/communityTax/communityTaxSlice';
+import generalServiceReceiptsReducer from '../features/collections/generalServiceReceiptsSlice';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     auth: authReducer,
     departments: departmentReducer,
@@ -37,7 +37,10 @@ const store = configureStore({
     chartOfAccounts: chartOfAccountsReducer,
     vendors: vendorReducer,
     employees: employeeReducer,
-    locations: locationReducer,
+    obligationRequests: obligationRequestReducer,
+    disbursementVouchers: disbursementVoucherReducer,
+    travelOrders: travelOrderReducer,
+    generalReceipts: generalReceiptReducer,
     ppes: ppeReducer,
     approvalMatrix: approvalMatrixReducer,
     banks: bankReducer,
@@ -52,16 +55,13 @@ const store = configureStore({
     taxCodes: taxCodesReducer,
     modeOfPayments: modeOfPaymentsReducer,
     paymentTerms: paymentTermsReducer,
-    industry: industryReducer,
-    budgetDetails: budgetDetailsReducer,
-    disbursementJournal: disbursementJournalReducer,
-    generalJournal: generalJournalReducer,
-    beginningBalances: beginningBalanceReducer,
-    purchaseRequests: purchaseRequestReducer,
+    industries: industryReducer,
+    communityTax: communityTaxReducer,
+    generalServiceReceipts: generalServiceReceiptsReducer
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({
-      serializableCheck: false, // Disable serializable check for now if needed
+      serializableCheck: false,
     }),
 });
 
