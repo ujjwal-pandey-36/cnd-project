@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Menu, Transition } from "@headlessui/react";
+import { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, Transition } from '@headlessui/react';
 import {
   BellIcon,
   Bars3Icon,
@@ -9,14 +9,15 @@ import {
   UserCircleIcon,
   KeyIcon,
   ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/outline";
-import { logout } from "../../features/auth/authSlice";
+} from '@heroicons/react/24/outline';
+import { logout, updateSelectedRole } from '../../features/auth/authSlice';
 
 function Header({ toggleSidebar, isSidebarOpen }) {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, selectedRole } = useSelector((state) => state.auth);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!showNotifications) return;
@@ -28,16 +29,24 @@ function Header({ toggleSidebar, isSidebarOpen }) {
         setShowNotifications(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showNotifications]);
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate('/login');
   };
-
+  // Handle role change
+  const handleRoleChange = (e) => {
+    const selectedRoleId = e.target.value;
+    const role = user.accessList.find((r) => r.ID === selectedRoleId);
+    if (role) {
+      dispatch(updateSelectedRole(role));
+    }
+  };
   return (
     <header className="bg-white shadow-sm z-10 relative">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,7 +59,7 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                 onClick={toggleSidebar}
               >
                 <span className="sr-only">
-                  {isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+                  {isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
                 </span>
                 {isSidebarOpen ? (
                   <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -66,7 +75,7 @@ function Header({ toggleSidebar, isSidebarOpen }) {
             </div>
           </div>
           <div className="flex items-center">
-            <button
+            {/* <button
               type="button"
               className="p-2 rounded-full text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 relative"
               onClick={() => setShowNotifications(!showNotifications)}
@@ -74,15 +83,30 @@ function Header({ toggleSidebar, isSidebarOpen }) {
               <span className="sr-only">View notifications</span>
               <BellIcon className="h-6 w-6" aria-hidden="true" />
               <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-error-600 ring-2 ring-white"></span>
-            </button>
-
+            </button> */}
+            {/* ✅ Role Selector */}
+            {user && user?.accessList?.length > 1 && (
+              <select
+                value={selectedRole?.ID || ''}
+                onChange={handleRoleChange}
+                className="text-sm border border-gray-300 rounded-md px-2 py-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="" hidden>
+                  Select Role
+                </option>
+                {user.accessList.map((role) => (
+                  <option key={role.ID} value={role.ID}>
+                    {role.Description}
+                  </option>
+                ))}
+              </select>
+            )}
             <div className="ml-3 relative">
               <Menu as="div" className="relative">
                 <Menu.Button className="bg-white rounded-full flex focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                   <span className="sr-only">Open user menu</span>
                   <div className="h-8 w-8 rounded-full bg-primary-700 flex items-center justify-center text-white">
-                    {user?.firstName?.charAt(0) || ""}
-                    {user?.lastName?.charAt(0) || ""}
+                    {user?.UserName?.charAt(0) || 'U'}
                   </div>
                 </Menu.Button>
 
@@ -98,13 +122,14 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                     <div className="py-1">
                       <div className="px-4 py-2">
                         <p className="text-sm font-medium text-neutral-900 truncate">
-                          {user?.firstName} {user?.lastName}
+                          {user?.UserName || 'User'}
                         </p>
-                        <p className="text-xs text-neutral-500">
+                        <p className="hidden text-xs text-neutral-500">
                           {user?.email}
                         </p>
                       </div>
                     </div>
+
                     {/* <div className="py-1">
                       <Menu.Item>
                         {({ active }) => (
@@ -133,6 +158,47 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                         )}
                       </Menu.Item>
                     </div> */}
+
+                    <div className="py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/profile')}
+                            className={`${
+                              active
+                                ? 'bg-neutral-100 text-neutral-900'
+                                : 'text-neutral-700'
+                            } flex items-center px-4 py-2 text-sm w-full text-left`}
+                          >
+                            <UserCircleIcon
+                              className="mr-3 h-5 w-5 text-neutral-400"
+                              aria-hidden="true"
+                            />
+                            Profile
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                    <div className="py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => navigate('/change-password')}
+                            className={`${
+                              active
+                                ? 'bg-neutral-100 text-neutral-900'
+                                : 'text-neutral-700'
+                            } flex items-center px-4 py-2 text-sm w-full text-left`}
+                          >
+                            <KeyIcon
+                              className="mr-3 h-5 w-5 text-neutral-400"
+                              aria-hidden="true"
+                            />
+                            Change Password
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
                     <div className="py-1">
                       <Menu.Item>
                         {({ active }) => (
@@ -140,8 +206,8 @@ function Header({ toggleSidebar, isSidebarOpen }) {
                             onClick={handleLogout}
                             className={`${
                               active
-                                ? "bg-neutral-100 text-neutral-900"
-                                : "text-neutral-700"
+                                ? 'bg-neutral-100 text-neutral-900'
+                                : 'text-neutral-700'
                             } flex items-center px-4 py-2 text-sm w-full text-left`}
                           >
                             <ArrowRightOnRectangleIcon

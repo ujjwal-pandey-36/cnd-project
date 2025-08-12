@@ -1,15 +1,16 @@
-import { ErrorMessage } from "formik";
-import clsx from "clsx";
-
+import { ErrorMessage } from 'formik';
+import clsx from 'clsx';
+import { useState } from 'react';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 function FormField({
   label,
   name,
-  type = "text",
-  placeholder = "",
+  type = 'text',
+  placeholder = '',
   required = false,
   disabled = false,
   readOnly = false,
-  className = "",
+  className = '',
   options = [],
   value,
   onChange,
@@ -20,10 +21,10 @@ function FormField({
   ...props
 }) {
   const isInvalid = error && touched;
-
+  const [showPassword, setShowPassword] = useState(false);
   const renderInput = () => {
     switch (type) {
-      case "textarea":
+      case 'textarea':
         return (
           <textarea
             id={name}
@@ -36,16 +37,45 @@ function FormField({
             onBlur={onBlur}
             rows={props.rows || 3}
             className={clsx(
-              "form-textarea border border-gray-300 focus:border-primary-500 focus:ring-primary-500",
+              'form-textarea border border-gray-300 px-4 py-2',
               isInvalid &&
-                "border-error-300 text-error-900 placeholder-error-300 focus:ring-error-500 focus:border-error-500",
+                'border-error-300 text-error-900 placeholder-error-300 focus:ring-error-500 focus:border-error-500',
               className
             )}
             {...props}
           />
         );
-
-      case "select":
+      case 'multiselect':
+        return (
+          <select
+            id={name}
+            name={name}
+            disabled={disabled}
+            multiple
+            value={value || []}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions).map(
+                (option) => option.value
+              );
+              onChange({ target: { name, value: selected } });
+            }}
+            onBlur={onBlur}
+            className={clsx(
+              'form-select border border-gray-300 px-4 py-2 h-auto',
+              isInvalid &&
+                'border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500',
+              className
+            )}
+            {...props}
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        );
+      case 'select':
         return (
           <select
             id={name}
@@ -55,14 +85,14 @@ function FormField({
             onChange={onChange}
             onBlur={onBlur}
             className={clsx(
-              "form-select border border-gray-300 focus:border-primary-500 focus:ring-primary-500",
+              'form-select border border-gray-300 px-4 py-2 pr-10',
               isInvalid &&
-                "border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500",
+                'border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500',
               className
             )}
             {...props}
           >
-            <option value="">{props.defaultOption || "Select"}</option>
+            <option value="">{props.defaultOption || 'Select'}</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -71,35 +101,37 @@ function FormField({
           </select>
         );
 
-      case "checkbox":
+      case 'checkbox':
         return (
-          <div className="flex items-center">
-            <input
-              id={name}
-              name={name}
-              type="checkbox"
-              disabled={disabled}
-              checked={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              className={clsx(
-                "form-checkbox",
-                isInvalid &&
-                  "border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500",
-                className
-              )}
-              {...props}
-            />
-            <label
-              htmlFor={name}
-              className="ml-2 block text-sm text-neutral-700"
-            >
-              {label}
-            </label>
+          <div className="flex items-center h-full">
+            <div className="flex items-center">
+              <input
+                id={name}
+                name={name}
+                type="checkbox"
+                disabled={disabled}
+                checked={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                className={clsx(
+                  'form-checkbox',
+                  isInvalid &&
+                    'border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500',
+                  className
+                )}
+                {...props}
+              />
+              <label
+                htmlFor={name}
+                className="ml-2 block text-sm text-neutral-700"
+              >
+                {label}
+              </label>
+            </div>
           </div>
         );
 
-      case "radio":
+      case 'radio':
         return (
           <div className="space-y-2">
             {options.map((option) => (
@@ -114,9 +146,9 @@ function FormField({
                   onChange={onChange}
                   onBlur={onBlur}
                   className={clsx(
-                    "form-radio",
+                    'form-radio ',
                     isInvalid &&
-                      "border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500",
+                      'border-error-300 text-error-900 focus:ring-error-500 focus:border-error-500',
                     className
                   )}
                   {...props}
@@ -131,12 +163,46 @@ function FormField({
             ))}
           </div>
         );
+      case 'password':
+        return (
+          <div className="relative">
+            <input
+              id={name}
+              name={name}
+              type={showPassword ? 'text' : 'password'}
+              placeholder={placeholder}
+              disabled={disabled}
+              readOnly={readOnly}
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              className={clsx(
+                'form-input border border-gray-300 h-[42px] px-4 py-2 pr-10 w-full',
+                isInvalid &&
+                  'border-error-300 text-error-900 placeholder-error-300 focus:ring-error-500 focus:border-error-500',
+                className
+              )}
+              {...props}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeSlashIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+        );
 
-      case "date":
-      case "number":
-      case "email":
-      case "password":
-      case "text":
+      case 'date':
+      case 'number':
+      case 'email':
+      case 'text':
       default:
         return (
           <input
@@ -150,9 +216,9 @@ function FormField({
             onChange={onChange}
             onBlur={onBlur}
             className={clsx(
-              "form-input border border-gray-300 focus:border-primary-500 focus:ring-primary-500",
+              'form-input border border-gray-300 h-[42px] px-4 py-2',
               isInvalid &&
-                "border-error-300 text-error-900 placeholder-error-300 focus:ring-error-500 focus:border-error-500",
+                'border-error-300 text-error-900 placeholder-error-300 focus:ring-error-500 focus:border-error-500',
               className
             )}
             {...props}
@@ -163,8 +229,8 @@ function FormField({
 
   // Don't render the additional label for checkbox type since it's handled inline
   return (
-    <div className={`form-group ${type === "checkbox" ? "" : "space-y-1"}`}>
-      {type !== "checkbox" && (
+    <div className={`form-group ${type === 'checkbox' ? '' : 'space-y-1'}`}>
+      {type !== 'checkbox' && (
         <label htmlFor={name} className="form-label">
           {label} {required && <span className="text-error-500">*</span>}
         </label>

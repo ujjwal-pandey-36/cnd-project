@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import  DataTable  from '../../components/common/DataTable';
+import DataTable from '../../components/common/DataTable';
 import FundUtilizationRequestForm from '../../components/forms/FundUtilizationRequestForm';
 import { Button } from '../../components/common/Button';
 import  Modal  from '../../components/common/Modal';
@@ -14,7 +14,7 @@ const mockData = [
     total: 1500.00,
     fiscalYear: '2024',
     project: 'Project 1',
-    customerId: 'CUST-001'
+    customerId: 'CUST-001',
   },
   {
     id: 2,
@@ -36,7 +36,7 @@ const columns = [
   { 
     header: 'Total', 
     accessor: 'total',
-    cell: (value) => `$${value.toFixed(2)}`
+    cell: (value) => `$${value.toFixed(2)}`,
   },
   { header: 'Fiscal Year', accessor: 'fiscalYear' },
   { header: 'Project', accessor: 'project' },
@@ -58,7 +58,7 @@ function FundUtilizationRequestPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Fund Utilization Requests</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Fund Utilization Requests and Status (FURS)</h1>
         <Button
           onClick={() => setIsModalOpen(true)}
           variant="primary"
@@ -76,7 +76,7 @@ function FundUtilizationRequestPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="New Fund Utilization Request"
+        title="New FURS"
       >
         <FundUtilizationRequestForm
           onSubmit={handleSubmit}

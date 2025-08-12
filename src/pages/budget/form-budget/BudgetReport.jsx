@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Calendar,
   Download,
@@ -11,163 +11,58 @@ import {
   TrendingUp,
   DollarSign,
   PieChart,
-} from "lucide-react";
+} from 'lucide-react';
 
 const BudgetReport = () => {
-  const [startDate, setStartDate] = useState("2025-05-30");
-  const [endDate, setEndDate] = useState("2025-05-30");
-  const [selectedFund, setSelectedFund] = useState("General Fund");
-  const [selectedFiscalYear, setSelectedFiscalYear] = useState("feb aug");
-  const [selectedDepartment, setSelectedDepartment] = useState("Accounting");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState("summary");
+  const [startDate, setStartDate] = useState('2025-05-30');
+  const [endDate, setEndDate] = useState('2025-05-30');
+  const [selectedFund, setSelectedFund] = useState('General Fund');
+  const [selectedFiscalYear, setSelectedFiscalYear] = useState('feb aug');
+  const [selectedDepartment, setSelectedDepartment] = useState('Accounting');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('summary');
 
   const budgetData = [
     {
-      id: "1",
-      name: "Petty Cash",
-      accountCode: "101010020",
+      id: '1',
+      name: 'Petty Cash',
+      accountCode: '101010020',
       appropriated: 40000.0,
       adjustments: 0,
       allotments: 0,
       obligations: 0,
       appropriationBalance: 40000.0,
       allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
+      fund: 'General Fund',
+      department: 'Accounting',
+      fiscalYear: 'feb aug',
       utilizationRate: 0,
     },
     {
-      id: "2",
-      name: "Petty Cash",
-      accountCode: "101010020",
+      id: '2',
+      name: 'Petty Cash',
+      accountCode: '101010020',
       appropriated: 1000000.0,
       adjustments: 0,
       allotments: 0,
       obligations: 0,
       appropriationBalance: 1000000.0,
       allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "3",
-      name: "Treasury Bills",
-      accountCode: "102010030",
-      appropriated: 2820001.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 2820001.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "4",
-      name: "Investments in Bonds - Long Term",
-      accountCode: "102030020",
-      appropriated: 60000.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 60000.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "5",
-      name: "Guaranty Deposits",
-      accountCode: "102050020",
-      appropriated: 40000.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 40000.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "6",
-      name: "Real Property Tax Receivable",
-      accountCode: "103010020",
-      appropriated: 30000.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 30000.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "7",
-      name: "Notes Receivable",
-      accountCode: "103010040",
-      appropriated: 480000.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 480000.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "8",
-      name: "Investment Property, Land",
-      accountCode: "106010010",
-      appropriated: 50.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 50.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
-      utilizationRate: 0,
-    },
-    {
-      id: "9",
-      name: "Due to LGUs",
-      accountCode: "202010070",
-      appropriated: 0.0,
-      adjustments: 0,
-      allotments: 0,
-      obligations: 0,
-      appropriationBalance: 0.0,
-      allotmentBalance: 0,
-      fund: "General Fund",
-      department: "Accounting",
-      fiscalYear: "feb aug",
+      fund: 'General Fund',
+      department: 'Accounting',
+      fiscalYear: 'feb aug',
       utilizationRate: 0,
     },
   ];
 
-  const funds = ["General Fund", "Special Fund", "Trust Fund", "Capital Fund"];
-  const fiscalYears = ["feb aug", "January to December", "April to March"];
+  const funds = ['General Fund', 'Special Fund', 'Trust Fund', 'Capital Fund'];
+  const fiscalYears = ['feb aug', 'January to December', 'April to March'];
   const departments = [
-    "Accounting",
-    "Administration",
-    "Finance",
-    "IT Department",
-    "Human Resources",
+    'Accounting',
+    'Administration',
+    'Finance',
+    'IT Department',
+    'Human Resources',
   ];
 
   const filteredData = budgetData.filter((item) => {
@@ -175,12 +70,12 @@ const BudgetReport = () => {
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.accountCode.includes(searchTerm);
     const matchesFund =
-      selectedFund === "All Funds" || item.fund === selectedFund;
+      selectedFund === 'All Funds' || item.fund === selectedFund;
     const matchesFiscalYear =
-      selectedFiscalYear === "All Years" ||
+      selectedFiscalYear === 'All Years' ||
       item.fiscalYear === selectedFiscalYear;
     const matchesDepartment =
-      selectedDepartment === "All Departments" ||
+      selectedDepartment === 'All Departments' ||
       item.department === selectedDepartment;
 
     return (
@@ -209,11 +104,11 @@ const BudgetReport = () => {
   );
 
   const handleExportToExcel = () => {
-    console.log("Exporting to Excel...");
+    console.log('Exporting to Excel...');
   };
 
   const handleViewReport = () => {
-    console.log("Viewing report...");
+    console.log('Viewing report...');
   };
 
   const handlePrintReport = () => {
@@ -230,43 +125,49 @@ const BudgetReport = () => {
             Comprehensive budget analysis and reporting dashboard
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-y-2 sm:gap-x-3 w-full sm:w-auto">
+          {/* Summary/Detailed Toggle - full width on mobile */}
+          <div className="flex items-center bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
             <button
-              onClick={() => setViewMode("summary")}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === "summary"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600"
+              onClick={() => setViewMode('summary')}
+              className={`w-1/2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'summary'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600'
               }`}
             >
               Summary
             </button>
             <button
-              onClick={() => setViewMode("detailed")}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === "detailed"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600"
+              onClick={() => setViewMode('detailed')}
+              className={`w-1/2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'detailed'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600'
               }`}
             >
               Detailed
             </button>
           </div>
-          <button
-            onClick={handlePrintReport}
-            className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <Printer className="w-4 h-4 mr-2" />
-            Print
-          </button>
-          <button
-            onClick={handleExportToExcel}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </button>
+
+          {/* Buttons row - side-by-side even on mobile */}
+          <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+            <button
+              onClick={handlePrintReport}
+              className="flex-1 sm:flex-initial flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              Print
+            </button>
+            <button
+              onClick={handleExportToExcel}
+              className="flex-1 sm:flex-initial flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </button>
+          </div>
         </div>
       </div>
 
@@ -455,7 +356,7 @@ const BudgetReport = () => {
       </div>
 
       {/* Report Content */}
-      {viewMode === "summary" ? (
+      {viewMode === 'summary' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Budget Distribution Chart */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -566,7 +467,7 @@ const BudgetReport = () => {
                   <tr
                     key={item.id}
                     className={`hover:bg-gray-50 transition-colors ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                     }`}
                   >
                     <td className="px-4 py-3 text-sm text-gray-900">
@@ -576,32 +477,32 @@ const BudgetReport = () => {
                       {item.accountCode}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">
-                      {item.appropriated.toLocaleString("en-US", {
+                      {item.appropriated.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right">
-                      {item.adjustments.toLocaleString("en-US", {
+                      {item.adjustments.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right">
-                      {item.allotments.toLocaleString("en-US", {
+                      {item.allotments.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right">
-                      {item.obligations.toLocaleString("en-US", {
+                      {item.obligations.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right font-medium">
-                      {item.appropriationBalance.toLocaleString("en-US", {
+                      {item.appropriationBalance.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900 text-right">
-                      {item.allotmentBalance.toLocaleString("en-US", {
+                      {item.allotmentBalance.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                       })}
                     </td>
@@ -617,32 +518,32 @@ const BudgetReport = () => {
                     TOTAL ({filteredData.length} items)
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.appropriated.toLocaleString("en-US", {
+                    {totals.appropriated.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.adjustments.toLocaleString("en-US", {
+                    {totals.adjustments.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.allotments.toLocaleString("en-US", {
+                    {totals.allotments.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.obligations.toLocaleString("en-US", {
+                    {totals.obligations.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.appropriationBalance.toLocaleString("en-US", {
+                    {totals.appropriationBalance.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-right font-bold">
-                    {totals.allotmentBalance.toLocaleString("en-US", {
+                    {totals.allotmentBalance.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                     })}
                   </td>
@@ -655,8 +556,8 @@ const BudgetReport = () => {
 
       {/* Summary Footer */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between text-sm text-gray-600 gap-y-4 sm:items-center">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-4">
             <span>
               Report for {selectedDepartment} - {selectedFiscalYear}
             </span>
@@ -665,7 +566,7 @@ const BudgetReport = () => {
             </span>
             <span>Fund: {selectedFund}</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-4">
             <span>Showing {filteredData.length} accounts</span>
             <span>Generated on {new Date().toLocaleDateString()}</span>
           </div>
