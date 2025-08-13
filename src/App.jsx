@@ -479,13 +479,42 @@ function App() {
         </Route>
 
         {/* Root redirect */}
-        <Route path="/" element={<Navigate to="/dashboard\" replace />} />
+        {/* <Route path="/" element={<Navigate to="/dashboard\" replace />} /> */}
+        <Route
+          path="/"
+          element={
+            <RootRedirect
+              isAuthenticated={isAuthenticated}
+              isLoading={isLoading}
+            />
+          }
+        />
 
         {/* 404 route */}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="*"
+          element={
+            <RootRedirect
+              isAuthenticated={isAuthenticated}
+              isLoading={isLoading}
+            />
+          }
+        />
       </Routes>
     </>
   );
 }
 
 export default App;
+// Add this new component
+function RootRedirect({ isAuthenticated, isLoading }) {
+  // const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return null; // or <LoadingSpinner />
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  } else {
+    return <Navigate to="/login" replace />;
+  }
+}
