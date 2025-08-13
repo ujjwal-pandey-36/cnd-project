@@ -2,20 +2,12 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
 import Header from '../components/layout/Header';
-import { useSelector } from 'react-redux';
 
 function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Close sidebar on mobile when navigating
   useEffect(() => {
@@ -44,12 +36,12 @@ function DashboardLayout() {
   };
 
   // Handle authentication redirect in useEffect
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   if (!token) {
-  //     navigate('/login');
-  //   }
-  // }, [navigate]);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-neutral-50">
