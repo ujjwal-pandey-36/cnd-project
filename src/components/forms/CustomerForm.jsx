@@ -8,6 +8,8 @@ import { fetchRegions } from '../../features/settings/regionsSlice';
 import { fetchProvinces } from '../../features/settings/provincesSlice';
 import { fetchMunicipalities } from '../../features/settings/municipalitiesSlice';
 import { fetchBarangays } from '../../features/settings/barangaysSlice';
+import { NationalityOptions } from '@/utils/Nationality';
+import SearchableDropdown from '../common/SearchableDropdown';
 
 function CustomerForm({ initialData, onSubmit, onClose }) {
   const dispatch = useDispatch();
@@ -34,39 +36,37 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
     PlaceOfBirth: Yup.string().required('Place of Birth is required'),
     Occupation: Yup.string().required('Occupation is required'),
     CivilStatus: Yup.string().required('Civil Status is required'),
-    TIN: Yup.string()
-      .required('TIN is required')
-      .matches(/^\d{14}$/, 'TIN must be exactly 14 digits'),
-    EmailAddress: Yup.string().email().required('Email is required'),
+    TIN: Yup.string().matches(/^\d{14}$/, 'TIN must be exactly 14 digits'),
+    EmailAddress: Yup.string().email(),
     RegionID: Yup.string().required('Region is required'),
     ProvinceID: Yup.string().required('Province is required'),
     MunicipalityID: Yup.string().required('Municipality is required'),
     BarangayID: Yup.string().required('Barangay is required'),
     ZIPCode: Yup.string().required('ZIP Code is required'),
     StreetAddress: Yup.string().required('Street Address is required'),
-    RDO: Yup.string().required('RDO is required'),
+    // RDO: Yup.string().required('RDO is required'),
   });
 
   const formik = useFormik({
-    initialValues: initialData || {
-      FirstName: '',
-      MiddleName: '',
-      LastName: '',
-      Gender: '',
-      Citizenship: '',
-      DateOfBirth: '',
-      PlaceOfBirth: '',
-      Occupation: '',
-      CivilStatus: '',
-      TIN: '',
-      EmailAddress: '',
-      RegionID: '',
-      ProvinceID: '',
-      MunicipalityID: '',
-      BarangayID: '',
-      ZIPCode: '',
-      StreetAddress: '',
-      RDO: '',
+    initialValues: {
+      FirstName: initialData?.FirstName || '',
+      MiddleName: initialData?.MiddleName || '',
+      LastName: initialData?.LastName || '',
+      Gender: initialData?.Gender || '',
+      Citizenship: initialData?.Citizenship || '',
+      DateOfBirth: initialData?.Birthdate || '',
+      PlaceOfBirth: initialData?.PlaceofBirth || '',
+      Occupation: initialData?.Occupation || '',
+      CivilStatus: initialData?.CivilStatus || '',
+      TIN: initialData?.TIN || '',
+      EmailAddress: initialData?.EmailAddress || '',
+      RegionID: initialData?.RegionID || '',
+      ProvinceID: initialData?.ProvinceID || '',
+      MunicipalityID: initialData?.MunicipalityID || '',
+      BarangayID: initialData?.BarangayID || '',
+      ZIPCode: initialData?.ZIPCode || '',
+      StreetAddress: initialData?.StreetAddress || '',
+      // RDO: initialData?.RDO || '',
     },
     validationSchema,
     onSubmit: (values) => onSubmit(values),
@@ -164,7 +164,7 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           touched={touched.Gender}
           required
         />
-        <FormField
+        {/* <FormField
           label="Citizenship"
           name="Citizenship"
           value={values.Citizenship}
@@ -173,6 +173,19 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           error={touched.Citizenship && errors.Citizenship}
           touched={touched.Citizenship}
           required
+        /> */}
+        <SearchableDropdown
+          label="Citizenship"
+          name="Citizenship"
+          type="select"
+          required
+          selectedValue={values.Citizenship}
+          onSelect={(value) => {
+            setFieldValue('Citizenship', value);
+          }}
+          options={NationalityOptions}
+          error={errors.Citizenship && errors.Citizenship}
+          touched={touched.Citizenship}
         />
         <FormField
           label="Date of Birth"
@@ -231,7 +244,7 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           onBlur={handleBlur}
           error={touched.TIN && errors.TIN}
           touched={touched.TIN}
-          required
+          // required
         />
         <FormField
           label="Email"
@@ -242,7 +255,7 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           onBlur={handleBlur}
           error={touched.EmailAddress && errors.EmailAddress}
           touched={touched.EmailAddress}
-          required
+          // required
         />
         <FormField
           label="Region"
@@ -314,7 +327,7 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           touched={touched.StreetAddress}
           required
         />
-        <FormField
+        {/* <FormField
           label="Revenue District Office"
           name="RDO"
           value={values.RDO}
@@ -323,7 +336,7 @@ function CustomerForm({ initialData, onSubmit, onClose }) {
           error={touched.RDO && errors.RDO}
           touched={touched.RDO}
           required
-        />
+        /> */}
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t">

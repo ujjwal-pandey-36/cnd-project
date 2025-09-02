@@ -102,7 +102,13 @@ function BudgetReportPage() {
       setLoading(true);
       const res = await axios.post(
         `${API_URL}/budgetReport/view`,
-        buildPayload()
+        buildPayload(),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
       );
       setEntries(res.data || []);
     } catch (err) {
@@ -125,6 +131,10 @@ function BudgetReportPage() {
         buildPayload(),
         {
           responseType: 'blob',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         }
       );
       const blob = new Blob([res.data], {
@@ -205,7 +215,10 @@ function BudgetReportPage() {
               value={fundsID}
               required
               onChange={(e) => setFundsID(e.target.value)}
-              options={funds.map((f) => ({ label: f.Name, value: f.ID }))}
+              options={[
+                { label: 'All Funds', value: '%' },
+                ...funds.map((f) => ({ label: f.Name, value: f.ID })),
+              ]}
             />
           </div>
           <div className="w-full sm:w-44">
@@ -216,7 +229,10 @@ function BudgetReportPage() {
               value={departmentID}
               required
               onChange={(e) => setDepartmentID(e.target.value)}
-              options={departments.map((d) => ({ label: d.Name, value: d.ID }))}
+              options={[
+                { label: 'All Departments', value: '%' },
+                ...departments.map((d) => ({ label: d.Name, value: d.ID })),
+              ]}
             />
           </div>
         </div>

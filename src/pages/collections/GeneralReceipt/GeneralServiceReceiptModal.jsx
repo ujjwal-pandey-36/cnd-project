@@ -56,6 +56,7 @@ function GeneralServiceReceiptModal({
   selectedReceipt,
   onSubmit,
   Print,
+  currentNumber,
 }) {
   const [payorType, setPayorType] = useState('Individual');
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -81,7 +82,9 @@ function GeneralServiceReceiptModal({
   }));
   const individualOptions = customers?.map((customer) => ({
     value: customer.ID,
-    label: customer.Name,
+    label:
+      customer.Name ||
+      `${customer.FirstName} ${customer.MiddleName} ${customer.LastName}`,
   }));
   const fundsOptions = funds?.map((item) => ({
     value: item.ID,
@@ -96,10 +99,11 @@ function GeneralServiceReceiptModal({
     value: code.ID,
     label: code.Name,
   }));
-
+  // console.log('selectedReceipt', currentNumber);
   const initialValues = {
     Status: selectedReceipt?.Status || 'Requested',
-    InvoiceNumber: selectedReceipt?.InvoiceNumber || '',
+    InvoiceNumber:
+      selectedReceipt?.InvoiceNumber || currentNumber?.CurrentNumber || '',
     InvoiceDate:
       selectedReceipt?.InvoiceDate || new Date().toISOString().split('T')[0],
 
@@ -294,7 +298,7 @@ function GeneralServiceReceiptModal({
                     <label className="block text-sm font-medium text-gray-700">
                       Status
                     </label>
-                    <div className="mt-1 px-3 py-2 bg-gray-100 rounded-md">
+                    <div className="mt-1 px-3 py-2 bg-gray-100 font-semibold text-blue-500 rounded-md">
                       {values?.Status.toUpperCase()}
                     </div>
                   </div>
@@ -305,7 +309,7 @@ function GeneralServiceReceiptModal({
                     required
                     onChange={handleChange}
                     value={values.InvoiceNumber}
-                    error={errors.InvoiceNumber}
+                    error={errors.InvoiceNumber && touched.InvoiceNumber}
                     touched={touched.InvoiceNumber}
                   />
                 </div>
@@ -341,7 +345,7 @@ function GeneralServiceReceiptModal({
                     required
                     onChange={handleChange}
                     value={values.FundsID}
-                    error={errors.FundsID}
+                    error={touched.FundsID && errors.FundsID}
                     touched={touched.FundsID}
                   />
                 </div>

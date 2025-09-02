@@ -68,7 +68,7 @@ function BudgetFundForm({ initialData, onSubmit, onClose }) {
               value={values.Code}
               error={errors.Code}
               touched={touched.Code}
-              placeholder="e.g., 1-01-01-010"
+              placeholder="e.g., 100,200,300"
               required
             />
             <FormField
@@ -86,15 +86,38 @@ function BudgetFundForm({ initialData, onSubmit, onClose }) {
             <FormField
               label="Amount"
               name="Amount"
-              type="text"
-              onChange={handleChange}
+              type="text" // text for full control
+              onChange={(e) => {
+                // Remove all non-digit characters
+                const rawValue = e.target.value.replace(/\D/g, '');
+
+                // Format into cents (two decimal places)
+                const formattedValue = rawValue
+                  ? (parseInt(rawValue, 10) / 100).toFixed(2)
+                  : '';
+
+                handleChange({
+                  target: {
+                    name: 'Amount',
+                    value: formattedValue,
+                  },
+                });
+              }}
               onBlur={handleBlur}
-              value={values.Amount}
+              value={
+                values.Amount !== '' && !isNaN(values.Amount)
+                  ? Number(values.Amount).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : ''
+              }
               error={errors.Amount}
               touched={touched.Amount}
-              placeholder="Enter Amount "
+              placeholder="Enter Amount"
               required
             />
+
             <FormField
               name="Description"
               type="textarea"

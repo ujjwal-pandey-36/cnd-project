@@ -15,16 +15,19 @@ import {
   fetchCommunityTaxes,
   deleteCommunityTax,
   addCommunityTax,
+  communityTaxGetCurrentNumber,
 } from '@/features/collections/CommunityTaxSlice';
-import { Trash } from 'lucide-react';
+import { CheckLine, Trash, X } from 'lucide-react';
 import { fetchCustomers } from '@/features/settings/customersSlice';
 import toast from 'react-hot-toast';
 import { useModulePermissions } from '@/utils/useModulePremission';
 function CommunityTaxPage() {
   const dispatch = useDispatch();
-  const { records: certificates, isLoading } = useSelector(
-    (state) => state.communityTax
-  );
+  const {
+    records: certificates,
+    currentNumber,
+    isLoading,
+  } = useSelector((state) => state.communityTax);
   const { customers, isLoading: customersLoading } = useSelector(
     (state) => state.customers
   );
@@ -36,6 +39,7 @@ function CommunityTaxPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showListModal, setShowListModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState({});
+
   useEffect(() => {
     dispatch(fetchCommunityTaxes());
     dispatch(fetchCustomers());
@@ -44,6 +48,7 @@ function CommunityTaxPage() {
   const handleCreateCertificate = () => {
     setCurrentCertificate(null);
     setCurrentView('form');
+    dispatch(communityTaxGetCurrentNumber());
   };
 
   const handleViewCertificate = (certificate) => {
@@ -170,29 +175,92 @@ function CommunityTaxPage() {
     );
   };
   // Actions for table rows
-  const actions = [
-    {
+  // const actions = [
+  //   {
+  //     icon: EyeIcon,
+  //     title: 'View',
+  //     onClick: handleViewCertificate,
+  //     className:
+  //       'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+  //   },
+  //   Edit && {
+  //     icon: PencilIcon,
+  //     title: 'Edit',
+  //     onClick: handleEditCertificate,
+  //     className:
+  //       'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+  //   },
+  //   Delete && {
+  //     icon: Trash,
+  //     title: 'Delete',
+  //     onClick: handleDeleteCertificate,
+  //     className:
+  //       'text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50',
+  //   },
+  // ];
+  const handleCTIAction = async (dv, action) => {
+    setIsLoadingCTCActions(true);
+    try {
+      // TODO : add action
+      // const response = await axiosInstance.post(
+      //   `/disbursementVoucher/${action}`,
+      //   { ID: dv.ID }
+      // );
+      console.log(`${action}d:`, response.data);
+      // dispatch(fetchGeneralServiceReceipts());
+      toast.success(`Community Tax Individual ${action}d successfully`);
+    } catch (error) {
+      console.error(`Error ${action}ing Community Tax Individual:`, error);
+      toast.error(`Error ${action}ing Community Tax Individual`);
+    } finally {
+      setIsLoadingCTCActions(false);
+    }
+  };
+  const actions = (row) => {
+    const actionList = [];
+
+    if (row.Status.toLowerCase().includes('rejected') && Edit) {
+      actionList.push({
+        icon: PencilIcon,
+        title: 'Edit',
+        onClick: handleEditCertificate,
+        className:
+          'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+      });
+      actionList.push({
+        icon: TrashIcon,
+        title: 'Delete',
+        onClick: handleDeleteCertificate,
+        className:
+          'text-error-600 hover:text-error-900 p-1 rounded-full hover:bg-error-50',
+      });
+    } else if (row.Status.toLowerCase().includes('requested')) {
+      actionList.push(
+        {
+          icon: CheckLine,
+          title: 'Approve',
+          onClick: () => handleCTIAction(row, 'approve'),
+          className:
+            'text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50',
+        },
+        {
+          icon: X,
+          title: 'Reject',
+          onClick: () => handleCTIAction(row, 'reject'),
+          className:
+            'text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50',
+        }
+      );
+    }
+    actionList.push({
       icon: EyeIcon,
       title: 'View',
       onClick: handleViewCertificate,
       className:
         'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
-    },
-    Edit && {
-      icon: PencilIcon,
-      title: 'Edit',
-      onClick: handleEditCertificate,
-      className:
-        'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
-    },
-    Delete && {
-      icon: Trash,
-      title: 'Delete',
-      onClick: handleDeleteCertificate,
-      className:
-        'text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50',
-    },
-  ];
+    });
+    return actionList;
+  };
   const handleShowList = () => {
     setShowListModal(true);
   };
@@ -281,7 +349,9 @@ function CommunityTaxPage() {
                 <SearchableDropdown
                   options={
                     customers?.map((customer) => ({
-                      label: customer.Name,
+                      label:
+                        customer.Name ||
+                        `${customer.FirstName} ${customer.MiddleName} ${customer.LastName}`,
                       value: customer.ID,
                     })) || []
                   }
@@ -321,6 +391,7 @@ function CommunityTaxPage() {
                 initialData={currentCertificate}
                 onCancel={handleBackToList}
                 onSubmitForm={handleFormSubmit}
+                currentCertificateNumber={currentNumber}
               />
             ) : (
               <h2 className="text-2xl font-bold text-gray-800 text-center h-[50vh]">

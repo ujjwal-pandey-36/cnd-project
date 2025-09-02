@@ -12,18 +12,21 @@ import {
   createGeneralServiceReceipt,
   deleteGeneralServiceReceipt,
   fetchGeneralServiceReceipts,
+  getGeneralServiceReceiptCurrentNumber,
 } from '@/features/collections/generalReceiptSlice';
 import GeneralServiceReceiptModal from './GeneralServiceReceiptModal';
 
 import toast from 'react-hot-toast';
-import { TrashIcon } from 'lucide-react';
+import { CheckLine, TrashIcon, X } from 'lucide-react';
 import { useModulePermissions } from '@/utils/useModulePremission';
 
 function GeneralReceiptPage() {
   const dispatch = useDispatch();
-  const { receipts: generalReceipts, isLoading } = useSelector(
-    (state) => state.generalReceipts
-  );
+  const {
+    receipts: generalReceipts,
+    isLoading,
+    currentNumber,
+  } = useSelector((state) => state.generalReceipts);
   // ---------------------USE MODULE PERMISSIONS------------------START (GeneralReceiptPage - MODULE ID =  52 )
   const { Add, Edit, Delete, Print } = useModulePermissions(52);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -31,7 +34,7 @@ function GeneralReceiptPage() {
   const [isServiceReceiptModalOpen, setIsServiceReceiptModalOpen] =
     useState(false);
   const [currentReceipt, setCurrentReceipt] = useState(null);
-
+  const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   useEffect(() => {
     dispatch(fetchGeneralServiceReceipts());
   }, [dispatch]);
@@ -44,6 +47,7 @@ function GeneralReceiptPage() {
   const handleCreateServiceReceipt = () => {
     setCurrentReceipt(null);
     setIsServiceReceiptModalOpen(true);
+    dispatch(getGeneralServiceReceiptCurrentNumber());
   };
 
   const handleViewReceipt = (receipt) => {
@@ -179,32 +183,68 @@ function GeneralReceiptPage() {
       render: (value) => value || '—',
     },
   ];
+  const handleGRPAction = async (dv, action) => {
+    setIsLoadingReceipt(true);
+    try {
+      const response = await axiosInstance.post(
+        `/disbursementVoucher/${action}`,
+        { ID: dv.ID }
+      );
+      console.log(`${action}d:`, response.data);
+      dispatch(fetchGeneralServiceReceipts());
+      toast.success(`General Receipt ${action}d successfully`);
+    } catch (error) {
+      console.error(`Error ${action}ing General Receipt:`, error);
+      toast.error(`Error ${action}ing General Receipt`);
+    } finally {
+      setIsLoadingReceipt(false);
+    }
+  };
+  const actions = (row) => {
+    const actionList = [];
 
-  // Actions for table rows
-  const actions = [
-    // {
-    //   icon: EyeIcon,
-    //   title: 'View',
-    //   onClick: handleViewReceipt,
-    //   className:
-    //     'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
-    // },
-    Edit && {
-      icon: PencilIcon,
-      title: 'Edit',
-      onClick: handleEditReceipt,
+    if (row.Status.toLowerCase().includes('rejected') && Edit) {
+      actionList.push({
+        icon: PencilIcon,
+        title: 'Edit',
+        onClick: () => handleEditOR(row),
+        className:
+          'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+      });
+      actionList.push({
+        icon: TrashIcon,
+        title: 'Delete',
+        onClick: () => handleDeleteReceipt(row),
+        className:
+          'text-error-600 hover:text-error-900 p-1 rounded-full hover:bg-error-50',
+      });
+    } else if (row.Status === 'Requested') {
+      actionList.push(
+        {
+          icon: CheckLine,
+          title: 'Approve',
+          onClick: () => handleGRPAction(row, 'approve'),
+          className:
+            'text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50',
+        },
+        {
+          icon: X,
+          title: 'Reject',
+          onClick: () => handleGRPAction(row, 'reject'),
+          className:
+            'text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50',
+        }
+      );
+    }
+    actionList.push({
+      icon: EyeIcon,
+      title: 'View',
+      onClick: () => handleViewReceipt(row),
       className:
         'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
-    },
-    Delete && {
-      icon: TrashIcon,
-      title: 'Delete',
-      onClick: handleDeleteReceipt,
-      className:
-        'text-error-600 hover:text-error-900 p-1 rounded-full hover:bg-error-50',
-    },
-  ];
-
+    });
+    return actionList;
+  };
   const handleGeneralServiceReceiptSubmit = async (values) => {
     if (!values) return; // Early return if no values
 
@@ -253,8 +293,7 @@ function GeneralReceiptPage() {
           columns={columns}
           data={generalReceipts}
           actions={actions}
-          loading={isLoading}
-          onRowClick={handleViewReceipt}
+          loading={isLoading || isLoadingReceipt}
         />
       </div>
 
@@ -265,117 +304,234 @@ function GeneralReceiptPage() {
         selectedReceipt={currentReceipt}
         onSubmit={handleGeneralServiceReceiptSubmit}
         Print={Print}
+        currentNumber={currentNumber}
       />
-
       {/* Receipt View Modal */}
-      <Modal
-        isOpen={isViewModalOpen}
-        onClose={handleCloseViewModal}
-        title="General Receipt Details"
-        size="lg"
-      >
-        {currentReceipt && (
-          <div className="p-4 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg bg-neutral-50 border border-neutral-200">
-              <div>
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">
-                  Receipt Details
-                </h3>
-                <dl className="space-y-2">
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      OR Number
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {currentReceipt.receiptNumber}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      Date
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {new Date(
-                        currentReceipt.receiptDate
-                      ).toLocaleDateString()}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      Fund
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {currentReceipt.fund}
-                    </dd>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      Mode of Payment
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {currentReceipt.modeOfPayment}
-                    </dd>
-                  </div>
-                </dl>
+      <>
+        <Modal
+          isOpen={isViewModalOpen}
+          onClose={handleCloseViewModal}
+          title="General Receipt Details"
+          size="lg"
+        >
+          {currentReceipt && (
+            <div className="p-4 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg bg-neutral-50 border border-neutral-200">
+                <div>
+                  <h3 className="text-lg font-medium text-neutral-900 mb-4">
+                    Receipt Details
+                  </h3>
+                  <dl className="space-y-2">
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        OR Number
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.InvoiceNumber || 'N/A'}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Date
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.InvoiceDate
+                          ? new Date(
+                              currentReceipt.InvoiceDate
+                            ).toLocaleDateString()
+                          : 'N/A'}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Fund
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.FundsID === 1
+                          ? 'General Fund'
+                          : currentReceipt.FundsID === 2
+                          ? 'Special Education Fund'
+                          : currentReceipt.FundsID || 'N/A'}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Mode of Payment
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.ModeofPayment ||
+                          (currentReceipt.CheckNumber
+                            ? 'Check'
+                            : currentReceipt.MoneyOrder
+                            ? 'Money Order'
+                            : 'Cash')}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Status
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${
+                            currentReceipt.Status === 'Posted'
+                              ? 'bg-green-100 text-green-800'
+                              : currentReceipt.Status === 'Rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {currentReceipt.Status}
+                        </span>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium text-neutral-900 mb-4">
+                    Payor Information
+                  </h3>
+                  <dl className="space-y-2">
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Name
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.CustomerName || 'N/A'}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Address
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.BillingAddress || 'N/A'}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-neutral-500">
+                        Due Date
+                      </dt>
+                      <dd className="text-sm text-neutral-900 col-span-2">
+                        {currentReceipt.BillingDueDate
+                          ? new Date(
+                              currentReceipt.BillingDueDate
+                            ).toLocaleDateString()
+                          : 'N/A'}
+                      </dd>
+                    </div>
+                    {currentReceipt.CheckNumber && (
+                      <div className="grid grid-cols-3 gap-4">
+                        <dt className="text-sm font-medium text-neutral-500">
+                          Check Number
+                        </dt>
+                        <dd className="text-sm text-neutral-900 col-span-2">
+                          {currentReceipt.CheckNumber}
+                        </dd>
+                      </div>
+                    )}
+                    {currentReceipt.MoneyOrder && (
+                      <div className="grid grid-cols-3 gap-4">
+                        <dt className="text-sm font-medium text-neutral-500">
+                          Money Order
+                        </dt>
+                        <dd className="text-sm text-neutral-900 col-span-2">
+                          {currentReceipt.MoneyOrder}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">
-                  Payor Information
-                </h3>
-                <dl className="space-y-2">
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      Name
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {currentReceipt.payorName}
-                    </dd>
+              {/* Transaction Items */}
+              {currentReceipt.TransactionItemsAll &&
+                currentReceipt.TransactionItemsAll.length > 0 && (
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h3 className="text-lg font-medium text-blue-900 mb-3">
+                      Transaction Items
+                    </h3>
+                    <div className="space-y-2">
+                      {currentReceipt.TransactionItemsAll.map((item, index) => (
+                        <div
+                          key={item.ID || index}
+                          className="flex justify-between items-center p-2 bg-white rounded border"
+                        >
+                          <div>
+                            <span className="text-sm font-medium">
+                              Item ID: {item.ItemID}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-2">
+                              Qty: {item.Quantity}
+                            </span>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {formatCurrency(parseFloat(item.Price || 0))}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <dt className="text-sm font-medium text-neutral-500">
-                      Address
-                    </dt>
-                    <dd className="text-sm text-neutral-900 col-span-2">
-                      {currentReceipt.payorAddress || 'N/A'}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
+                )}
 
-            <div className="p-4 bg-success-50 rounded-lg border border-success-200">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-success-700">
-                  Total Amount
-                </span>
-                <span className="text-2xl font-bold text-success-700">
-                  {formatCurrency(currentReceipt.totalAmount)}
-                </span>
+              <div className="p-4 bg-success-50 rounded-lg border border-success-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-success-700">
+                    Total Amount
+                  </span>
+                  <span className="text-2xl font-bold text-success-700">
+                    {formatCurrency(parseFloat(currentReceipt.Total || 0))}
+                  </span>
+                </div>
+                {currentReceipt.RemainingBalance &&
+                  parseFloat(currentReceipt.RemainingBalance) > 0 && (
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-sm font-medium text-orange-700">
+                        Remaining Balance
+                      </span>
+                      <span className="text-lg font-bold text-orange-700">
+                        {formatCurrency(
+                          parseFloat(currentReceipt.RemainingBalance)
+                        )}
+                      </span>
+                    </div>
+                  )}
               </div>
-            </div>
 
-            <div className="flex justify-end space-x-3 pt-4 border-t border-neutral-200">
-              <button
-                type="button"
-                onClick={handleCloseViewModal}
-                className="btn btn-outline"
-              >
-                Close
-              </button>
-              {Edit && (
+              {currentReceipt.Remarks && (
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Remarks
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {currentReceipt.Remarks}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-end space-x-3 pt-4 border-t border-neutral-200">
                 <button
                   type="button"
-                  onClick={() => handleEditReceipt(currentReceipt)}
-                  className="btn btn-primary"
+                  onClick={handleCloseViewModal}
+                  className="btn btn-outline"
                 >
-                  Edit
+                  Close
                 </button>
-              )}
+                {Edit && (
+                  <button
+                    type="button"
+                    onClick={() => handleEditReceipt(currentReceipt)}
+                    className="btn btn-primary"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </Modal>
+          )}
+        </Modal>
+      </>
     </div>
   );
 }

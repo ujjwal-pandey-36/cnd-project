@@ -13,6 +13,9 @@ import {
   SaveIcon,
   EditIcon,
   Paperclip,
+  PrinterIcon,
+  CheckLine,
+  X,
 } from 'lucide-react';
 import DataTable from '@/components/common/DataTable';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,6 +54,7 @@ function ChequeGeneratorPage() {
   const [attachments, setAttachments] = useState([]);
   const [currentCheck, setCurrentCheck] = useState(null);
   const [chequeList, setChequeList] = useState([]);
+  const [isLoadingBAPAction, setIsLoadingBAPAction] = useState(false);
 
   const dispatch = useDispatch();
   const { banks, isLoading } = useSelector((state) => state.banks);
@@ -58,7 +62,7 @@ function ChequeGeneratorPage() {
     (state) => state.employees
   );
   // ---------------------USE MODULE PERMISSIONS------------------START (ChequeGeneratorPage - MODULE ID = 16 )
-  const { Add, Edit, Delete } = useModulePermissions(33);
+  const { Add, Edit, Delete, Print } = useModulePermissions(33);
   // Formik initialization
   const formik = useFormik({
     initialValues: {
@@ -252,6 +256,17 @@ function ChequeGeneratorPage() {
       key: 'Amount',
       header: 'Amount',
       sortable: true,
+      render: (value) => (
+        <span className="font-medium">
+          {' '}
+          {value
+            ? Number(value).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            : '—'}
+        </span>
+      ),
     },
     {
       key: 'ApprovalProgress',
@@ -265,14 +280,82 @@ function ChequeGeneratorPage() {
     },
   ];
 
-  const actions = [
-    Edit && {
-      icon: PencilIcon,
-      title: 'Edit',
-      onClick: (item) => handleEditCheque(item),
-    },
-  ];
+  // const actions = [
+  //   Edit && {
+  //     icon: PencilIcon,
+  //     title: 'Edit',
+  //     onClick: (item) => handleEditCheque(item),
+  //   },
+  // ];
+  const handleDelete = (dv) => {
+    console.log('Delete', dv);
+  };
+  const handleView = (dv) => {
+    console.log('View', dv);
+  };
+  const handleCGPAction = async (dv, action) => {
+    setIsLoadingBAPAction(true);
+    try {
+      // TODO : add action
+      // const response = await axiosInstance.post(
+      //   `/disbursementVoucher/${action}`,
+      //   { ID: dv.ID }
+      // );
+      console.log(`${action}d:`, response.data);
+      // dispatch(fetchGeneralServiceReceipts());
+      toast.success(`Budget Allotment ${action}d successfully`);
+    } catch (error) {
+      console.error(`Error ${action}ing Budget Allotment:`, error);
+      toast.error(`Error ${action}ing Budget Allotment`);
+    } finally {
+      setIsLoadingBAPAction(false);
+    }
+  };
+  const actions = (row) => {
+    const actionList = [];
 
+    if (row.Status.toLowerCase().includes('rejected') && Edit) {
+      actionList.push({
+        icon: PencilIcon,
+        title: 'Edit',
+        onClick: handleEditCheque,
+        className:
+          'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+      });
+      actionList.push({
+        icon: TrashIcon,
+        title: 'Delete',
+        onClick: () => handleDelete(row),
+        className:
+          'text-error-600 hover:text-error-900 p-1 rounded-full hover:bg-error-50',
+      });
+    } else if (row.Status.toLowerCase().includes('requested')) {
+      actionList.push(
+        {
+          icon: CheckLine,
+          title: 'Approve',
+          onClick: () => handleCGPAction(row, 'approve'),
+          className:
+            'text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50',
+        },
+        {
+          icon: X,
+          title: 'Reject',
+          onClick: () => handleCGPAction(row, 'reject'),
+          className:
+            'text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50',
+        }
+      );
+    }
+    actionList.push({
+      icon: EyeIcon,
+      title: 'View',
+      onClick: handleView,
+      className:
+        'text-primary-600 hover:text-primary-900 p-1 rounded-full hover:bg-primary-50',
+    });
+    return actionList;
+  };
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="page-header">
@@ -304,6 +387,33 @@ function ChequeGeneratorPage() {
               >
                 <EditIcon className="h-5 w-5 mr-2" />
                 Edit
+              </button>
+            )}
+            {currentCheck && Print && (
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('Print');
+                }}
+                // onClick={formik.handleSubmit}
+                className="btn btn-primary max-sm:w-full"
+                disabled={formik.isSubmitting}
+              >
+                <PrinterIcon className="h-5 w-5 mr-2" />
+                Print
+              </button>
+            )}
+            {currentCheck && (
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('Attachment');
+                }}
+                // onClick={formik.handleSubmit}
+                className="btn btn-primary max-sm:w-full"
+                disabled={formik.isSubmitting}
+              >
+                Attachment
               </button>
             )}
             {currentCheck && (
@@ -549,11 +659,28 @@ function ChequeGeneratorPage() {
 
               <div>
                 <FormField
-                  type="number"
-                  label={'Amount'}
+                  type="text" // so we can control formatting
+                  label="Amount"
                   name="amount"
-                  value={formik.values.amount}
-                  onChange={formik.handleChange}
+                  value={
+                    formik.values.amount !== '' && !isNaN(formik.values.amount)
+                      ? Number(formik.values.amount).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      : ''
+                  }
+                  onChange={(e) => {
+                    // Remove all non-digit characters
+                    const rawValue = e.target.value.replace(/\D/g, '');
+
+                    // Format as cents (two decimal places)
+                    const formattedValue = rawValue
+                      ? (parseInt(rawValue, 10) / 100).toFixed(2)
+                      : '';
+
+                    formik.setFieldValue('amount', formattedValue);
+                  }}
                   step="0.01"
                   error={formik.touched.amount && formik.errors.amount}
                   touched={formik.touched.amount}
@@ -659,7 +786,7 @@ function ChequeGeneratorPage() {
           columns={columns}
           data={chequeList}
           actions={actions}
-          loading={isLoading || employeeLoading}
+          loading={isLoading || employeeLoading || isLoadingBAPAction}
           pagination
         />
       </div>

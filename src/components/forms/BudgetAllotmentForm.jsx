@@ -41,9 +41,11 @@ const initialValues = {
   releasedAllotments: 0,
   releasedBalance: 0,
   Attachments: [],
+  Status: 'Requested',
 };
 
 function BudgetAllotmentForm({
+  isView,
   initialData,
   onSubmit,
   onClose,
@@ -78,6 +80,7 @@ function BudgetAllotmentForm({
         releasedAllotments: Budget?.ReleasedAllotments || 0,
         releasedBalance: Budget?.ReleasedBalance || 0,
         Attachments: Budget?.Attachments || [],
+        Status: initialData?.Status || 'Requested',
       });
     } else {
       setFormData(initialValues);
@@ -222,8 +225,8 @@ function BudgetAllotmentForm({
                     >
                       <div className="flex items-center">
                         <Paperclip className="h-4 w-4 text-gray-500 mr-2" />
-                        <span className="text-sm">
-                          {file.ID ? (
+                        {/* <span className="text-sm">
+                         {file.ID ? (
                             <a
                               href={`${API_URL}/uploads/${file.DataImage}`}
                               target="_blank"
@@ -235,6 +238,24 @@ function BudgetAllotmentForm({
                           ) : (
                             file.name || file.DataName
                           )}
+                        </span> */}
+
+                        <span className="text-xs text-gray-500 ml-2">
+                          <a
+                            href={
+                              file?.ID
+                                ? `${API_URL}/uploads/${file?.DataImage}`
+                                : URL.createObjectURL(file)
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {file?.name || file?.DataName}
+                          </a>
+                        </span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          {file?.type}
                         </span>
                       </div>
                       <button
@@ -255,7 +276,14 @@ function BudgetAllotmentForm({
                 </p>
               )}
             </div>
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Status
+              </label>
+              <div className="mt-1 px-3 py-2 bg-gray-100 font-semibold text-blue-500 rounded-md">
+                {values?.Status?.toUpperCase() || 'Requested'}
+              </div>
+            </div>
             <FormField
               label="Budget Name"
               name="budgetName"
@@ -442,18 +470,24 @@ function BudgetAllotmentForm({
             />
           </div>
 
-          <div className="flex justify-end space-x-3">
-            <button type="button" onClick={onClose} className="btn btn-outline">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn btn-primary"
-            >
-              {initialData ? 'Update' : 'Save'}
-            </button>
-          </div>
+          {!isView && (
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-outline"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="btn btn-primary"
+              >
+                {initialData ? 'Update' : 'Save'}
+              </button>
+            </div>
+          )}
         </Form>
       )}
     </Formik>

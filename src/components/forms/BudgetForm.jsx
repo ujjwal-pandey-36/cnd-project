@@ -121,6 +121,7 @@ function BudgetForm({
         handleBlur,
         isSubmitting,
         submitCount,
+        setFieldValue,
       }) => (
         <Form className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,11 +215,17 @@ function BudgetForm({
               name="Appropriation"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.Appropriation}
+              value={
+                values.Appropriation !== '' && !isNaN(values.Appropriation)
+                  ? Number(values.Appropriation).toLocaleString()
+                  : ''
+              }
               error={errors.Appropriation}
               touched={touched.Appropriation}
-              type="number"
+              type="text" // 👈 change to text so commas display properly
               required
+              readOnly
+              className="bg-gray-100"
             />
             <FormField
               label="Charges"
@@ -230,6 +237,8 @@ function BudgetForm({
               error={errors.Charges}
               touched={touched.Charges}
               required
+              readOnly
+              className="bg-gray-100"
             />
             <FormField
               label="Total Amount"
@@ -276,10 +285,49 @@ function BudgetForm({
                 key={month}
                 label={month}
                 name={month}
-                type="number"
-                onChange={handleChange}
+                type="text" // keep as text to allow formatting with commas
+                onChange={(e) => {
+                  // Remove commas and parse as number
+                  const rawValue = e.target.value.replace(/,/g, '');
+                  const numericValue = rawValue === '' ? '' : Number(rawValue);
+
+                  // Save clean numeric value in Formik
+                  handleChange({
+                    target: { name: month, value: numericValue },
+                  });
+
+                  // Get all month values including updated one
+                  const updatedMonths = { ...values, [month]: numericValue };
+
+                  // Calculate sum of Jan-Dec
+                  const monthsList = [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December',
+                  ];
+
+                  const sum = monthsList.reduce(
+                    (total, m) => total + (Number(updatedMonths[m]) || 0),
+                    0
+                  );
+
+                  setFieldValue('Appropriation', sum);
+                }}
                 onBlur={handleBlur}
-                value={values[month]}
+                value={
+                  values[month] !== '' && !isNaN(values[month])
+                    ? Number(values[month]).toLocaleString() // 👈 no decimals
+                    : ''
+                }
                 error={errors[month]}
                 touched={touched[month]}
               />
